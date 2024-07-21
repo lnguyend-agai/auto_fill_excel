@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import order_app
 import user_name
+import display_data
 
 class MyApp:
     def __init__(self, root):
@@ -41,7 +42,8 @@ class MyApp:
 
     def button1_action(self):
         user_input = self.input_entry.get()
-        messagebox.showinfo("Button 1", f"Button 1 pressed. Input: {user_input}")
+        data = user_name.extract_dishes_and_quantities(user_input)
+        display_data.display_data(data)
 
     def button2_action(self):
         user_input = self.input_entry.get()
@@ -49,6 +51,7 @@ class MyApp:
             user_list = user_name.return_list_name(user_input)
             file_path = "C:\\Users\\PC\\Desktop\\customer_test.xlsx"
             order_app.auto_fill(user_list, file_path)
+            messagebox.showinfo("Button 1", "Completed fill Excel successfully!")
         except ValueError as e:
             messagebox.showerror("Error", str(e))
 
