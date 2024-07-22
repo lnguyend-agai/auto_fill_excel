@@ -3,6 +3,7 @@ from tkinter import messagebox
 import order_app
 import user_name
 import display_data
+import os
 
 class MyApp:
     def __init__(self, root):
@@ -49,7 +50,8 @@ class MyApp:
         user_input = self.input_entry.get()
         try:
             user_list = user_name.return_list_name(user_input)
-            file_path = "C:\\Users\\PC\\Desktop\\customer_test.xlsx"
+            current_directory = os.getcwd()
+            file_path = os.path.join(current_directory, 'data', 'Order_Record.xlsx')
             order_app.auto_fill(user_list, file_path)
             messagebox.showinfo("Button 1", "Completed fill Excel successfully!")
         except ValueError as e:

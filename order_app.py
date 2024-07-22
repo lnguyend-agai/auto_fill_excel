@@ -9,13 +9,23 @@ def auto_fill(user_list: List[str], file_path: str):
     new_list = map_user_names(user_list)
     current_day = get_current_day()
 
-    df = pd.read_excel(file_path, engine='openpyxl')
+    xls = pd.ExcelFile(file_path)
+
+    # Get the sheet names
+    sheet_names = xls.sheet_names
+
+    # Check if there are any sheets in the workbook
+    if sheet_names:
+    # Get the name of the last sheet
+        last_sheet_name = sheet_names[-1]
+        df = pd.read_excel(file_path, engine='openpyxl', sheet_name=last_sheet_name)
 
     print("Original Data:")
     print(df)
 
-    update_cells(new_list, current_day, df)
-    df.to_excel(file_path, index=False)
+    df = update_cells(new_list, current_day, df)
+    with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+        df.to_excel(writer, sheet_name=last_sheet_name, index=False)
 
     print("\nUpdated DataFrame:")
     print(df)
@@ -25,8 +35,10 @@ def update_cells(new_list: List[str], current_day: str, df, price: int = 30):
     Updates the cells in the DataFrame for the specified user names and current day.
     """
     for name in new_list:
-        if name in df['Tên'].values:
-            df.loc[df['Tên'] == name, current_day] = price
+        if name in df['Ngày'].values:
+            df.loc[df['Ngày'] == name, current_day] = price
+            
+    return df
 
 def get_current_day() -> str:
     """
@@ -51,15 +63,19 @@ def map_user_names(user_list: List[str]) -> List[str]:
     Maps the user names from the provided list to their corresponding values.
     """
     name_mapping = {
-        'LOC': 'Lộc',
-        'DUC': 'A.Đức',
-        'KHIEM': 'A.Khiêm',
-        'BAO': 'Baro',
+        'HIEU': 'A.Le.Hiếu',
         'THINH': 'A.Thịnh',
-        'TRUNG': 'A.Trung',
-        'HIEU': 'A.Hiếu',
-        'PHAT': 'A.Phát',
-        'TAI': 'A.Tài',
-        'CANH': 'Cảnh'
+        'TAI': 'A Tài',
+        'OKSANA': 'Oksana',
+        'CANH': 'Cảnh',
+        'BAO': 'Baro',
+        'NGOC': 'B.Ngọc',
+        'TUYEN': 'Tuyên',
+        'NGUYEN': 'Nguyên',
+        'THAI': 'Thái',
+        'DUC': 'A.Đức',
+        'PHAT': 'A Phát Dom',
+        'TRUNG': 'A Trung',
+        'KHIEM': 'A.Khiêm'  
     }
     return [name_mapping.get(name.upper(), name) for name in user_list]
