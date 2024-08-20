@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+import openpyxl
 from typing import List
 
 def auto_fill(user_list: List[str], file_path: str):
@@ -10,13 +11,26 @@ def auto_fill(user_list: List[str], file_path: str):
     current_day = get_current_day()
 
     xls = pd.ExcelFile(file_path)
+    wb = openpyxl.load_workbook(file_path, data_only=False)
+    
+    sheet_names_wb = wb.sheetnames
+    if sheet_names_wb:
+        last_sheet_name = sheet_names_wb[-1]
+    
+    formula_cells = {}
+
+    last_work_sheet = wb[last_sheet_name]
+    formula_cells[last_sheet_name] = {}
+    for row in last_work_sheet.iter_rows():
+        for cell in row:
+            if cell.data_type == 'f':  # Check if the cell contains a formula
+                formula_cells[last_sheet_name][cell.coordinate] = cell.value
 
     # Get the sheet names
     sheet_names = xls.sheet_names
 
     # Check if there are any sheets in the workbook
     if sheet_names:
-    # Get the name of the last sheet
         last_sheet_name = sheet_names[-1]
         df = pd.read_excel(file_path, engine='openpyxl', sheet_name=last_sheet_name)
 
@@ -29,6 +43,15 @@ def auto_fill(user_list: List[str], file_path: str):
 
     print("\nUpdated DataFrame:")
     print(df)
+    
+    # Reapply the formulas
+    wb = openpyxl.load_workbook(file_path)
+    for sheet_name, cells in formula_cells.items():
+        ws = wb[sheet_name]
+        for cell_coord, formula in cells.items():
+            ws[cell_coord] = formula
+    
+    wb.save(file_path)
 
 def update_cells(new_list: List[str], current_day: str, df, price: int = 30):
     """
@@ -79,3 +102,4 @@ def map_user_names(user_list: List[str]) -> List[str]:
         'KHIEM': 'A.Khiêm'  
     }
     return [name_mapping.get(name.upper(), name) for name in user_list]
+

@@ -17,7 +17,8 @@ def return_list_name(input_text):
         raise ValueError("Menu not found in the input text")
     
     # Extract menu items
-    menu_items = lines[menu_start_idx].replace("Menu thứ3; ", "").split(", ")
+    # menu_items = lines[menu_start_idx].replace("Menu thứ3; ", "").split(", ")
+    menu_items = re.split(r'[,.] ', lines[menu_start_idx].replace("Menu thứ3; ", ""))
     menu_set = set(item.strip() for item in menu_items)  # Clean up any extra spaces
     
     # List to store the names of people who liked a dish from the menu
@@ -45,7 +46,7 @@ def return_list_name(input_text):
     # Remove duplicates (if any)
     return list(set(liked_people))
 
-def extract_dishes_and_quantities(input_text):
+def extract_dishes_and_quantities(input_text: str):
     """
     Extracts dishes and their quantities (number of likes) from the input text.
     """
@@ -63,8 +64,8 @@ def extract_dishes_and_quantities(input_text):
     
     # Extract menu items and clean up spaces
     menu_line = lines[menu_start_idx]
-    menu_items = menu_line.replace("Menu thứ3; ", "").split(", ")
-    menu_set = set(item.strip() for item in menu_items)
+    menu_items = re.split(r'[,.] ', menu_line.replace("Menu thứ3; ", ""))
+    menu_set = set(item.strip().strip('.') for item in menu_items)
     
     # Dictionary to keep track of the number of likes for each dish
     dish_likes = defaultdict(int)
@@ -84,6 +85,8 @@ def extract_dishes_and_quantities(input_text):
             # Update the dish count if the dish is in the menu and if the like value is 1
             if like == 1 and dish in menu_set:
                 dish_likes[dish] += 1
+        elif lines[i] in menu_set:
+            dish_likes[lines[i]] +=1
         
         # Move to the next set of lines
         i += 1
