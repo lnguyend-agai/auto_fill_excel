@@ -27,6 +27,8 @@ It will find the correct date and fill in the corresponding price for each perso
 ## Feature 1:
 ![image](https://github.com/user-attachments/assets/d67d125a-858b-457d-a3f9-de87b659b827)
 
+A table show dishes and quantity
+
 ## Feature 2:
 ![image](https://github.com/user-attachments/assets/5c1685d4-442a-4659-a7ed-037efe7b3078)
 
